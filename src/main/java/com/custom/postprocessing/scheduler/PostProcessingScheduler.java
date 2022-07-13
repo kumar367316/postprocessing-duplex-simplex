@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -107,6 +105,9 @@ public class PostProcessingScheduler {
 
 	@Value("${pcl.evaluation.copies}")
 	private boolean pclEvalutionCopies;
+	
+	@Value("${empty.file.name}")
+	private String blankPdfFileName;
 
 	/*
 	 * @Autowired EmailUtil1 emailUtil1;
@@ -387,8 +388,7 @@ public class PostProcessingScheduler {
 	public void deleteFiles(List<String> fileNameList) {
 		for (String fileName : fileNameList) {
 			File file = new File(fileName);
-			boolean delete = file.delete();
-			System.out.println(fileName + " is delete:" + delete);
+			file.delete();
 		}
 	}
 
@@ -418,7 +418,7 @@ public class PostProcessingScheduler {
 	public String getEmptyPage() throws URISyntaxException, StorageException, FileNotFoundException, IOException {
 		CloudBlobContainer container = containerInfo();
 		CloudBlobDirectory transitDirectory = getDirectoryName(container, ROOT_DIRECTORY, BANNER_DIRECTORY);
-		String blankPage = "blank" + PDF_EXTENSION;
+		String blankPage = blankPdfFileName + PDF_EXTENSION;
 		CloudBlockBlob blob = transitDirectory.getBlockBlobReference(blankPage);
 		File source = new File(blankPage);
 		blob.downloadToFile(source.getAbsolutePath());
